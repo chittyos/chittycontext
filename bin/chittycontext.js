@@ -530,12 +530,22 @@ queues
     "Create queues for current context (uses context's Cloudflare account)",
   )
   .option("-c, --context <name>", "Context name (defaults to current)")
+  .option("--blockchain", "Include ChittyChain blockchain queue")
+  .option("--custom <queues>", "Comma-separated list of custom queue names")
   .action(async (options) => {
     try {
       const contextName = options.context || contextManager.getCurrentContext();
       console.log(chalk.blue(`🌀 Creating queues for context: ${contextName}`));
 
-      const results = await contextManager.createQueues(contextName);
+      const createOptions = {
+        blockchain: options.blockchain,
+        custom: options.custom ? options.custom.split(",") : null,
+      };
+
+      const results = await contextManager.createQueues(
+        contextName,
+        createOptions,
+      );
 
       console.log(chalk.bold("\n📊 Queue Creation Results:\n"));
       results.forEach((result) => {
@@ -621,6 +631,46 @@ queues
       console.log();
     } catch (error) {
       console.error(chalk.red(`❌ Failed to get config: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+queues
+  .command("bindings")
+  .description("Generate wrangler.toml queue bindings for current context")
+  .option("-c, --context <name>", "Context name (defaults to current)")
+  .action(async (options) => {
+    try {
+      const contextName = options.context || contextManager.getCurrentContext();
+      const bindings = contextManager.generateWranglerBindings(contextName);
+
+      console.log(
+        chalk.bold(`\n📝 Wrangler.toml Queue Bindings for '${contextName}':\n`),
+      );
+
+      if (bindings.length === 0) {
+        console.log(chalk.dim("  No queue bindings to generate"));
+      } else {
+        console.log(chalk.cyan("[[queues.consumers]]"));
+        bindings.forEach((binding) => {
+          console.log(`queue = "${binding.queue}"`);
+          console.log(`max_batch_size = 10`);
+          console.log(`max_batch_timeout = 30`);
+          console.log("");
+        });
+
+        console.log(chalk.cyan("\n[[queues.producers]]"));
+        bindings.forEach((binding) => {
+          console.log(`binding = "${binding.binding}"`);
+          console.log(`queue = "${binding.queue}"`);
+          console.log("");
+        });
+      }
+      console.log();
+    } catch (error) {
+      console.error(
+        chalk.red(`❌ Failed to generate bindings: ${error.message}`),
+      );
       process.exit(1);
     }
   });
