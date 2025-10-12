@@ -1,8 +1,8 @@
 {
-  "name": "chittycontext",
+  "name": "@chittyos/context",
   "version": "1.0.0",
-  "description": "Universal multi-account and persona management for ChittyOS platform",
-  "main": "lib/index.js",
+  "description": "Universal multi-account and persona management for ChittyOS platform. Manage Cloudflare, GitHub, Google, Neon, and 1Password secrets with context switching and automatic distribution.",
+  "main": "lib/context-manager.js",
   "type": "module",
   "bin": {
     "chittycontext": "./bin/chittycontext.js",
@@ -10,23 +10,52 @@
   },
   "scripts": {
     "install-global": "npm link",
-    "test": "node --test lib/*.test.js"
+    "test": "node --test lib/*.test.js",
+    "prepublishOnly": "echo 'Ready to publish @chittyos/context'"
   },
   "keywords": [
+    "chittyos",
     "cloudflare",
     "github",
     "google",
+    "neon",
+    "1password",
     "account-management",
     "context-switching",
-    "persona-management"
+    "persona-management",
+    "secrets-management",
+    "secret-distribution",
+    "wrangler",
+    "multi-account",
+    "devops",
+    "cli"
   ],
-  "author": "ChittyOS",
+  "author": "ChittyOS <hello@chitty.cc>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chittyos/context.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chittyos/context/issues"
+  },
+  "homepage": "https://github.com/chittyos/context#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "CLAUDE.md",
+    "README.md"
+  ],
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.0.0",
     "conf": "^12.0.0",
     "dotenv": "^16.6.1",
     "inquirer": "^9.2.0"
-  }
+  },
+  "devDependencies": {},
+  "peerDependencies": {}
 }
