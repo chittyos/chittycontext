@@ -243,6 +243,282 @@ program
     }
   });
 
+// ChittyRegistry integration
+const registry = program
+  .command("registry")
+  .description("Manage ChittyRegistry integration");
+
+registry
+  .command("sync")
+  .description("Sync with ChittyRegistry")
+  .action(async () => {
+    try {
+      await contextManager.syncWithRegistry();
+    } catch (error) {
+      console.error(chalk.red(`❌ Registry sync failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+registry
+  .command("register")
+  .description("Register ChittyContext service with ChittyRegistry")
+  .action(async () => {
+    try {
+      await contextManager.registerWithRegistry();
+    } catch (error) {
+      console.error(chalk.red(`❌ Registration failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+registry
+  .command("discover")
+  .description("Discover available services in ChittyRegistry")
+  .action(async () => {
+    try {
+      const servicesData = await contextManager.discoverServices();
+
+      // Handle different response formats
+      let services = [];
+      if (Array.isArray(servicesData)) {
+        services = servicesData;
+      } else if (
+        servicesData.services &&
+        Array.isArray(servicesData.services)
+      ) {
+        services = servicesData.services;
+      } else if (typeof servicesData === "object") {
+        // Convert object entries to array
+        services = Object.entries(servicesData).map(([name, config]) => ({
+          name: name,
+          ...config,
+        }));
+      }
+
+      console.log(chalk.bold("\n🔍 Available Services:\n"));
+      if (services.length === 0) {
+        console.log(chalk.dim("  No services found"));
+      } else {
+        services.forEach((service) => {
+          const serviceName = service.name || service.service_name || "unknown";
+          const version = service.version || "unknown";
+          console.log(`  ${chalk.green(serviceName)} (${version})`);
+          if (service.description) {
+            console.log(chalk.dim(`     ${service.description}`));
+          }
+        });
+      }
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Service discovery failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+registry
+  .command("pull <service>")
+  .description("Pull service configuration from registry (e.g., chittyauth)")
+  .action(async (service) => {
+    try {
+      const config = await contextManager.pullServiceConfig(service);
+      console.log(chalk.dim(`\n📦 Service Configuration:`));
+      console.log(
+        chalk.dim(`   URL: ${config.url || config.health_endpoint || "N/A"}`),
+      );
+      console.log(chalk.dim(`   Version: ${config.version || "unknown"}`));
+      if (config.capabilities) {
+        console.log(
+          chalk.dim(`   Capabilities: ${config.capabilities.join(", ")}`),
+        );
+      }
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to pull service: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+// Service-aware environment export
+program
+  .command("env-services")
+  .description("Export environment variables including service configurations")
+  .option("-s, --shell <type>", "Shell type (bash, zsh, fish)", "bash")
+  .action(async (options) => {
+    try {
+      const envVars =
+        await contextManager.getEnvironmentVariablesWithServices();
+
+      if (options.shell === "fish") {
+        Object.entries(envVars).forEach(([key, value]) => {
+          console.log(`set -gx ${key} "${value}"`);
+        });
+      } else {
+        Object.entries(envVars).forEach(([key, value]) => {
+          console.log(`export ${key}="${value}"`);
+        });
+      }
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to export env: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+// Vault and secrets management
+const vault = program
+  .command("vault")
+  .description("Manage 1Password vaults and secrets");
+
+vault
+  .command("create <context>")
+  .description("Create a 1Password vault for a context")
+  .action(async (context) => {
+    try {
+      const result = await contextManager.createContextVault(context);
+      console.log(chalk.green(`✅ Created vault: ${result.vaultName}`));
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to create vault: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+vault
+  .command("list")
+  .description("List all 1Password vaults")
+  .action(async () => {
+    try {
+      const vaults = await contextManager.listVaults();
+      console.log(chalk.bold("\n🔐 1Password Vaults:\n"));
+      vaults.forEach((vault) => {
+        console.log(`  ${chalk.green(vault.name || vault.id)}`);
+        if (vault.description) {
+          console.log(chalk.dim(`     ${vault.description}`));
+        }
+      });
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to list vaults: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+vault
+  .command("store <vault> <item>")
+  .description("Store a secret in 1Password")
+  .option("--cloudflare-account-id <id>", "Cloudflare account ID")
+  .option("--cloudflare-token <token>", "Cloudflare API token")
+  .option("--github-token <token>", "GitHub token")
+  .option("--neon-connection <string>", "Neon connection string")
+  .action(async (vaultName, itemName, options) => {
+    try {
+      const secretData = {};
+      if (options.cloudflareAccountId)
+        secretData.account_id = options.cloudflareAccountId;
+      if (options.cloudflareToken) secretData.token = options.cloudflareToken;
+      if (options.githubToken) secretData.token = options.githubToken;
+      if (options.neonConnection)
+        secretData.connection_string = options.neonConnection;
+
+      await contextManager.storeSecret(vaultName, itemName, secretData);
+      console.log(
+        chalk.green(`✅ Stored secret: ${itemName} in vault ${vaultName}`),
+      );
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to store secret: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+// Secrets distribution
+const secrets = program
+  .command("secrets")
+  .description("Manage secret distribution to services");
+
+secrets
+  .command("sync <context>")
+  .description("Sync secrets from 1Password to all configured services")
+  .action(async (context) => {
+    try {
+      console.log(chalk.blue(`🔄 Syncing secrets for context: ${context}`));
+      const results = await contextManager.distributeSecrets(context);
+
+      console.log(chalk.bold("\n📊 Distribution Results:\n"));
+
+      if (results.cloudflare.length > 0) {
+        console.log(
+          chalk.green(
+            `☁️  Cloudflare: ${results.cloudflare.length} secrets distributed`,
+          ),
+        );
+      }
+      if (results.github.length > 0) {
+        console.log(
+          chalk.green(
+            `🐙 GitHub: ${results.github.length} secrets distributed`,
+          ),
+        );
+      }
+      if (results.neon.length > 0) {
+        console.log(
+          chalk.green(`🗄️  Neon: ${results.neon.length} secrets distributed`),
+        );
+      }
+      if (results.errors.length > 0) {
+        console.log(chalk.red(`\n❌ Errors: ${results.errors.length}`));
+        results.errors.forEach((err) => {
+          console.log(
+            chalk.dim(`   ${err.service}/${err.secret}: ${err.error}`),
+          );
+        });
+      }
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to sync secrets: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+secrets
+  .command("configure <context> <service>")
+  .description("Configure secret distribution for a service")
+  .option("--worker <name>", "Cloudflare Worker name")
+  .option("--repo <name>", "GitHub repository (owner/repo)")
+  .option("--project <id>", "Neon project ID")
+  .option("--secret-name <name>", "Secret name")
+  .option("--vault-item <item>", "1Password vault item name")
+  .option("--vault-field <field>", "1Password vault item field")
+  .action(async (context, service, options) => {
+    try {
+      const secretConfig = {
+        name: options.secretName,
+        item: options.vaultItem,
+        field: options.vaultField || "password",
+      };
+
+      if (service === "cloudflare") {
+        secretConfig.worker = options.worker;
+      } else if (service === "github") {
+        secretConfig.repo = options.repo;
+      } else if (service === "neon") {
+        secretConfig.projectId = options.project;
+      }
+
+      await contextManager.configureSecretDistribution(
+        context,
+        service,
+        secretConfig,
+      );
+      console.log(
+        chalk.green(
+          `✅ Configured secret distribution for ${service} in ${context}`,
+        ),
+      );
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to configure: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
 program.parse(process.argv);
 
 // Show help if no command provided
