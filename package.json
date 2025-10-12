@@ -1,6 +1,6 @@
 {
   "name": "@chittyos/chittycontext-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Universal multi-account and persona management for ChittyOS platform. Manage Cloudflare, GitHub, Google, Neon, and 1Password secrets with context switching and automatic distribution.",
   "main": "lib/context-manager.js",
   "type": "module",
