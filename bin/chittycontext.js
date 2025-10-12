@@ -519,6 +519,112 @@ secrets
     }
   });
 
+// Queue management
+const queues = program
+  .command("queues")
+  .description("Manage Cloudflare Queues for contexts");
+
+queues
+  .command("create")
+  .description(
+    "Create queues for current context (uses context's Cloudflare account)",
+  )
+  .option("-c, --context <name>", "Context name (defaults to current)")
+  .action(async (options) => {
+    try {
+      const contextName = options.context || contextManager.getCurrentContext();
+      console.log(chalk.blue(`🌀 Creating queues for context: ${contextName}`));
+
+      const results = await contextManager.createQueues(contextName);
+
+      console.log(chalk.bold("\n📊 Queue Creation Results:\n"));
+      results.forEach((result) => {
+        if (result.status === "created") {
+          console.log(chalk.green(`✅ ${result.queue}`));
+        } else {
+          console.log(chalk.red(`❌ ${result.queue}: ${result.error}`));
+        }
+      });
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to create queues: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+queues
+  .command("list")
+  .description("List queues for current context")
+  .option("-c, --context <name>", "Context name (defaults to current)")
+  .action(async (options) => {
+    try {
+      const contextName = options.context || contextManager.getCurrentContext();
+      const queueList = await contextManager.listQueues(contextName);
+
+      console.log(chalk.bold(`\n🌀 Queues for context '${contextName}':\n`));
+      if (queueList.length === 0) {
+        console.log(chalk.dim("  No queues found"));
+      } else {
+        queueList.forEach((queue) => {
+          console.log(`  ${chalk.green(queue.name)}`);
+          console.log(
+            chalk.dim(`     Producers: ${queue.producers_total_count || 0}`),
+          );
+          console.log(
+            chalk.dim(`     Consumers: ${queue.consumers_total_count || 0}`),
+          );
+        });
+      }
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to list queues: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+queues
+  .command("delete <queue>")
+  .description("Delete a queue from current context")
+  .option("-c, --context <name>", "Context name (defaults to current)")
+  .action(async (queueName, options) => {
+    try {
+      const contextName = options.context || contextManager.getCurrentContext();
+      const result = await contextManager.deleteQueue(contextName, queueName);
+      console.log(chalk.green(`✅ Deleted queue: ${result.queue}`));
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to delete queue: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+queues
+  .command("config")
+  .description("Show queue configuration for current context")
+  .option("-c, --context <name>", "Context name (defaults to current)")
+  .action(async (options) => {
+    try {
+      const contextName = options.context || contextManager.getCurrentContext();
+      const config = contextManager.getQueueConfig(contextName);
+
+      console.log(
+        chalk.bold(`\n⚙️  Queue Configuration for '${contextName}':\n`),
+      );
+      if (Object.keys(config).length === 0) {
+        console.log(chalk.dim("  No queues configured"));
+      } else {
+        Object.entries(config).forEach(([name, queueConfig]) => {
+          console.log(`  ${chalk.green(name)}: ${queueConfig.name}`);
+          console.log(chalk.dim(`     Account: ${queueConfig.accountId}`));
+          console.log(chalk.dim(`     Created: ${queueConfig.createdAt}`));
+        });
+      }
+      console.log();
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to get config: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
 program.parse(process.argv);
 
 // Show help if no command provided
