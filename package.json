@@ -1,5 +1,5 @@
 {
-  "name": "@chittyos/context",
+  "name": "@chittyos/chittycontext-client",
   "version": "1.0.0",
   "description": "Universal multi-account and persona management for ChittyOS platform. Manage Cloudflare, GitHub, Google, Neon, and 1Password secrets with context switching and automatic distribution.",
   "main": "lib/context-manager.js",
@@ -11,7 +11,7 @@
   "scripts": {
     "install-global": "npm link",
     "test": "node --test lib/*.test.js",
-    "prepublishOnly": "echo 'Ready to publish @chittyos/context'"
+    "prepublishOnly": "echo 'Ready to publish @chittyos/chittycontext-client'"
   },
   "keywords": [
     "chittyos",
@@ -34,12 +34,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chittyos/context.git"
+    "url": "https://github.com/chittyos/chittycontext-client.git"
   },
   "bugs": {
-    "url": "https://github.com/chittyos/context/issues"
+    "url": "https://github.com/chittyos/chittycontext-client/issues"
   },
-  "homepage": "https://github.com/chittyos/context#readme",
+  "homepage": "https://github.com/chittyos/chittycontext-client#readme",
   "engines": {
     "node": ">=18.0.0"
   },

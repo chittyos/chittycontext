@@ -2,7 +2,7 @@
 
 > Universal multi-account and persona management for developers working with multiple cloud services, organizations, and workflows.
 
-[![npm version](https://badge.fury.io/js/@chittyos%2Fcontext.svg)](https://www.npmjs.com/package/@chittyos/context)
+[![npm version](https://badge.fury.io/js/@chittyos%2Fchittycontext-client.svg)](https://www.npmjs.com/package/@chittyos/chittycontext-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -42,13 +42,13 @@
 ### Global Installation (Recommended)
 
 ```bash
-npm install -g @chittyos/context
+npm install -g @chittyos/chittycontext-client
 ```
 
 ### Local Installation
 
 ```bash
-npm install @chittyos/context
+npm install @chittyos/chittycontext-client
 ```
 
 ## Quick Start
@@ -335,11 +335,11 @@ MIT © ChittyOS
 
 ## Links
 
-- [GitHub Repository](https://github.com/chittyos/context)
-- [npm Package](https://www.npmjs.com/package/@chittyos/context)
+- [GitHub Repository](https://github.com/chittyos/chittycontext-client)
+- [npm Package](https://www.npmjs.com/package/@chittyos/chittycontext-client)
 - [ChittyOS Platform](https://chitty.cc)
 - [Documentation](https://docs.chitty.cc)
-- [Issues](https://github.com/chittyos/context/issues)
+- [Issues](https://github.com/chittyos/chittycontext-client/issues)
 
 ## Alias
 
