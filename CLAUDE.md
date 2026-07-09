@@ -160,7 +160,7 @@ ChittyContext exports `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` which W
 chittycontext use work
 eval $(chittycontext env)
 wrangler whoami          # Uses work account
-cf deploy          # Deploys to work account
+wrangler deploy          # Deploys to work account
 ```
 
 ### Shell Integration
@@ -268,11 +268,11 @@ CHITTYREGISTRY_URL=https://registry.chitty.cc
 ```bash
 # Work on ChittyOS production services
 ctx use work
-cf deploy --env production
+wrangler deploy --env production
 
 # Switch to personal projects
 ctx use personal
-cf deploy
+wrangler deploy
 ```
 
 ### Legal Case Context

@@ -167,11 +167,11 @@ chittycontext env
 ```bash
 # Work on ChittyOS production
 ctx use work
-cf deploy --env production
+wrangler deploy --env production
 
 # Switch to personal projects
 ctx use personal
-cf deploy
+wrangler deploy
 ```
 
 ### Legal Case Management
