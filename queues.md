@@ -55,7 +55,7 @@ All queues are created in the context's configured Cloudflare account, ensuring 
 
 ### 3. Vault Operations Queue
 **Name**: `chittycontext-vault-ops-{context}`
-**Purpose**: Handle 1Password vault operations
+**Purpose**: Handle chittysecrets vault operations
 **Consumer**: Worker for vault creation, secret storage, rotation
 **Binding**: `CHITTYCONTEXT_VAULT_OPS`
 

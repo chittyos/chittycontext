@@ -9,7 +9,7 @@
  * - Google Workspace (multiple identities)
  * - Notion (workspaces)
  * - Neon (database projects)
- * - 1Password (vaults)
+ * - chittysecrets (vaults)
  * - AI services (OpenAI, Anthropic)
  */
 
@@ -117,7 +117,7 @@ cloudflare
   .description("Add a new Cloudflare account")
   .option("-i, --account-id <id>", "Account ID")
   .option("-t, --token <token>", "API token")
-  .option("--token-from-1password <item>", "Fetch token from 1Password")
+  .option("--token-from-chittysecrets <item>", "Fetch token from chittysecrets")
   .action(async (name, options) => {
     try {
       await contextManager.addCloudflareAccount(name, options);
@@ -163,7 +163,7 @@ github
   .command("add <name>")
   .description("Add a new GitHub account")
   .option("-t, --token <token>", "Personal access token")
-  .option("--token-from-1password <item>", "Fetch token from 1Password")
+  .option("--token-from-chittysecrets <item>", "Fetch token from chittysecrets")
   .action(async (name, options) => {
     try {
       await contextManager.addGitHubAccount(name, options);
@@ -367,11 +367,11 @@ program
 // Vault and secrets management
 const vault = program
   .command("vault")
-  .description("Manage 1Password vaults and secrets");
+  .description("Manage chittysecrets vaults and secrets");
 
 vault
   .command("create <context>")
-  .description("Create a 1Password vault for a context")
+  .description("Create a chittysecrets vault for a context")
   .action(async (context) => {
     try {
       const result = await contextManager.createContextVault(context);
@@ -384,11 +384,11 @@ vault
 
 vault
   .command("list")
-  .description("List all 1Password vaults")
+  .description("List all chittysecrets vaults")
   .action(async () => {
     try {
       const vaults = await contextManager.listVaults();
-      console.log(chalk.bold("\n🔐 1Password Vaults:\n"));
+      console.log(chalk.bold("\n🔐 chittysecrets Vaults:\n"));
       vaults.forEach((vault) => {
         console.log(`  ${chalk.green(vault.name || vault.id)}`);
         if (vault.description) {
@@ -404,7 +404,7 @@ vault
 
 vault
   .command("store <vault> <item>")
-  .description("Store a secret in 1Password")
+  .description("Store a secret in chittysecrets")
   .option("--cloudflare-account-id <id>", "Cloudflare account ID")
   .option("--cloudflare-token <token>", "Cloudflare API token")
   .option("--github-token <token>", "GitHub token")
@@ -436,7 +436,7 @@ const secrets = program
 
 secrets
   .command("sync <context>")
-  .description("Sync secrets from 1Password to all configured services")
+  .description("Sync secrets from chittysecrets to all configured services")
   .action(async (context) => {
     try {
       console.log(chalk.blue(`🔄 Syncing secrets for context: ${context}`));
@@ -485,8 +485,8 @@ secrets
   .option("--repo <name>", "GitHub repository (owner/repo)")
   .option("--project <id>", "Neon project ID")
   .option("--secret-name <name>", "Secret name")
-  .option("--vault-item <item>", "1Password vault item name")
-  .option("--vault-field <field>", "1Password vault item field")
+  .option("--vault-item <item>", "chittysecrets vault item name")
+  .option("--vault-field <field>", "chittysecrets vault item field")
   .action(async (context, service, options) => {
     try {
       const secretConfig = {

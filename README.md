@@ -8,8 +8,8 @@
 ## Features
 
 🔐 **Secrets Management**
-- Create and manage 1Password vaults per context
-- Store secrets securely in 1Password
+- Create and manage chittysecrets vaults per context
+- Store secrets securely in chittysecrets
 - Automatically distribute secrets to:
   - Cloudflare Workers (via `wrangler secret put`)
   - GitHub repositories (via `gh secret set`)
@@ -63,7 +63,7 @@ chittycontext create work
 # Add Cloudflare account
 chittycontext cf add chittyos \
   --account-id your-account-id \
-  --token-from-1password "op://ChittyOS/Cloudflare/token"
+  --token-from-chittysecrets "op://ChittyOS/Cloudflare/token"
 
 # Switch to work context
 chittycontext use work
@@ -93,7 +93,7 @@ chittycontext delete <name>              # Delete context
 
 ```bash
 chittycontext cf add <name> --account-id <id> --token <token>
-chittycontext cf add <name> --token-from-1password "op://..."
+chittycontext cf add <name> --token-from-chittysecrets "op://..."
 chittycontext cf use <account>
 chittycontext cf list
 ```
@@ -102,7 +102,7 @@ chittycontext cf list
 
 ```bash
 chittycontext gh add <name> --token <token>
-chittycontext gh add <name> --token-from-1password "op://..."
+chittycontext gh add <name> --token-from-chittysecrets "op://..."
 chittycontext gh use <account>
 ```
 
@@ -122,7 +122,7 @@ chittycontext vault create work
 # List all vaults
 chittycontext vault list
 
-# Store secret in 1Password
+# Store secret in chittysecrets
 chittycontext vault store ChittyContext-work my-cf-token \
   --cloudflare-account-id abc123 \
   --cloudflare-token mytoken
@@ -167,11 +167,11 @@ chittycontext env
 ```bash
 # Work on ChittyOS production
 ctx use work
-wrangler deploy --env production
+cf deploy --env production
 
 # Switch to personal projects
 ctx use personal
-wrangler deploy
+cf deploy
 ```
 
 ### Legal Case Management
@@ -189,7 +189,7 @@ ctx google use legal@chittycorp.com
 ### Secret Rotation
 
 ```bash
-# Update token in 1Password, then sync
+# Update token in chittysecrets, then sync
 ctx secrets sync work
 
 # Distributes to:
@@ -205,7 +205,7 @@ ctx secrets sync work
 ctx create team-shared
 
 # Each team member adds their own credentials
-ctx cf add shared-account --token-from-1password "op://..."
+ctx cf add shared-account --token-from-chittysecrets "op://..."
 ```
 
 ## Configuration
@@ -227,7 +227,7 @@ Configuration stored in: `~/.config/chittycontext/config.json`
       "chittyos": {
         "account_id": "abc123...",
         "token": "...",
-        "token_source": "1password:op://..."
+        "token_source": "chittysecrets:op://..."
       }
     }
   },
@@ -263,14 +263,14 @@ alias ctx-personal='chittycontext use personal && eval $(chittycontext env)'
 ## Requirements
 
 - **Node.js**: >= 18.0.0
-- **1Password CLI**: Required for vault management ([Install](https://developer.1password.com/docs/cli/get-started/))
+- **chittysecrets CLI**: Required for vault management ([Install](https://developer.chittysecrets.com/docs/cli/get-started/))
 - **Wrangler**: Optional, for Cloudflare secret distribution
 - **GitHub CLI**: Optional, for GitHub secret distribution
 
 ## Security
 
 - Tokens stored in `~/.config/chittycontext/config.json` (mode 600)
-- 1Password CLI integration for secure secret management
+- chittysecrets CLI integration for secure secret management
 - Never logs or displays full tokens
 - Config file excluded from git by default
 - ChittyRegistry operations require valid `CHITTY_ID_TOKEN`
@@ -299,13 +299,13 @@ eval $(chittycontext env)
 wrangler whoami
 ```
 
-### 1Password fetch fails
+### chittysecrets fetch fails
 
 ```bash
-# Ensure 1Password CLI is installed
+# Ensure chittysecrets CLI is installed
 op --version
 
-# Sign in to 1Password
+# Sign in to chittysecrets
 op signin
 
 # Test fetch
@@ -321,7 +321,7 @@ wrangler whoami
 # Check GitHub CLI
 gh auth status
 
-# Verify 1Password connectivity
+# Verify chittysecrets connectivity
 op vault list
 ```
 

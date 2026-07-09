@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ChittyContext** is a universal multi-account and persona management CLI tool for the ChittyOS ecosystem. It enables seamless context switching across multiple platforms (Cloudflare, GitHub, Google, Notion, Neon, 1Password, AI services) for developers working with multiple accounts, organizations, and workflows.
+**ChittyContext** is a universal multi-account and persona management CLI tool for the ChittyOS ecosystem. It enables seamless context switching across multiple platforms (Cloudflare, GitHub, Google, Notion, Neon, chittysecrets, AI services) for developers working with multiple accounts, organizations, and workflows.
 
 **Location**: `/Users/nb/.claude/projects/-/CHITTYOS/chittyos-core/tools/chittycontext`
 
@@ -51,13 +51,13 @@ chittycontext registry register                # Manual registration
 
 # Cloudflare account management
 chittycontext cf add chittyos --account-id <id> --token <token>
-chittycontext cf add chittyos --account-id <id> --token-from-1password "op://..."
+chittycontext cf add chittyos --account-id <id> --token-from-chittysecrets "op://..."
 chittycontext cf use chittyos
 chittycontext cf list
 
 # GitHub account management
 chittycontext gh add chittycorp --token <token>
-chittycontext gh add chittycorp --token-from-1password "op://..."
+chittycontext gh add chittycorp --token-from-chittysecrets "op://..."
 chittycontext gh use chittycorp
 
 # Google identity management
@@ -81,7 +81,7 @@ chittycontext env --shell fish | source # Fish shell
 **`lib/context-manager.js`** - Core business logic
 - Manages contexts and account configurations
 - Uses `conf` package for persistent storage at `~/.config/chittycontext/config.json`
-- Handles 1Password CLI integration for secure secret fetching
+- Handles chittysecrets CLI integration for secure secret fetching
 - Generates environment variables for active context
 
 **`lib/display.js`** - Display utilities
@@ -110,7 +110,7 @@ Configuration stored at: `~/.config/chittycontext/config.json`
       "chittyos": {
         "account_id": "0bc21e3a...",
         "token": "...",
-        "token_source": "1password:op://..."
+        "token_source": "chittysecrets:op://..."
       }
     },
     "github": {...},
@@ -130,10 +130,10 @@ When switching contexts, ChittyContext exports environment variables:
 
 ## Key Design Patterns
 
-### 1Password Integration
-- Tokens can be stored in 1Password and referenced with `op://vault/item/field` syntax
-- Uses `op read` command from 1Password CLI to fetch secrets at runtime
-- Token sources are tracked in config (`1password:...` or `direct`)
+### chittysecrets Integration
+- Tokens can be stored in chittysecrets and referenced with `op://vault/item/field` syntax
+- Uses `op read` command from chittysecrets CLI to fetch secrets at runtime
+- Token sources are tracked in config (`chittysecrets:...` or `direct`)
 
 ### Context Switching
 - Each context is a named collection of service account mappings
@@ -148,7 +148,7 @@ Currently supports:
 - Google (OAuth credentials path)
 - Notion (workspace)
 - Neon (database connection string)
-- 1Password (vault)
+- chittysecrets (vault)
 - AI services (OpenAI, Anthropic)
 
 ## Integration with ChittyOS
@@ -160,7 +160,7 @@ ChittyContext exports `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` which W
 chittycontext use work
 eval $(chittycontext env)
 wrangler whoami          # Uses work account
-wrangler deploy          # Deploys to work account
+cf deploy          # Deploys to work account
 ```
 
 ### Shell Integration
@@ -268,11 +268,11 @@ CHITTYREGISTRY_URL=https://registry.chitty.cc
 ```bash
 # Work on ChittyOS production services
 ctx use work
-wrangler deploy --env production
+cf deploy --env production
 
 # Switch to personal projects
 ctx use personal
-wrangler deploy
+cf deploy
 ```
 
 ### Legal Case Context
@@ -295,22 +295,22 @@ Expected test coverage areas:
 - Context creation, switching, and deletion
 - Account management (add, use, list)
 - Environment variable generation
-- 1Password integration
+- chittysecrets integration
 - Error handling
 
 ## Security Considerations
 
 - Config file at `~/.config/chittycontext/config.json` should have restrictive permissions
-- Tokens stored in config file (not ideal - prefer 1Password integration)
+- Tokens stored in config file (not ideal - prefer chittysecrets integration)
 - Full tokens are never displayed in output (only truncated previews)
-- 1Password CLI integration recommended for production use
+- chittysecrets CLI integration recommended for production use
 
 ## Known Issues & TODOs
 
 From `TODO.md`:
 1. `inquirer` dependency is imported but unused (consider removing or implementing interactive prompts)
 2. Config file permissions (mode 600) are not enforced programmatically
-3. No validation for 1Password CLI availability before attempting `op read`
+3. No validation for chittysecrets CLI availability before attempting `op read`
 4. Limited error handling for corrupt config.json
 5. Environment export tested only in bash/zsh (fish support exists but untested)
 

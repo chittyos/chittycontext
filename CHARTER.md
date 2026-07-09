@@ -7,14 +7,14 @@
 
 ## Mission
 
-ChittyContext is a **universal multi-account and persona management CLI tool** for the ChittyOS ecosystem. It enables seamless context switching across multiple platforms (Cloudflare, GitHub, Google, Notion, Neon, 1Password, AI services) for developers working with multiple accounts, organizations, and workflows.
+ChittyContext is a **universal multi-account and persona management CLI tool** for the ChittyOS ecosystem. It enables seamless context switching across multiple platforms (Cloudflare, GitHub, Google, Notion, Neon, chittysecrets, AI services) for developers working with multiple accounts, organizations, and workflows.
 
 ## Scope
 
 ### IS Responsible For
 - Context creation, switching, and management
 - Multi-platform account management (Cloudflare, GitHub, Google, Notion, Neon)
-- 1Password CLI integration for secure secret fetching
+- chittysecrets CLI integration for secure secret fetching
 - Environment variable generation and export
 - ChittyRegistry service discovery and sync
 - Persona-based workflow isolation (work, personal, litigation contexts)
@@ -24,7 +24,7 @@ ChittyContext is a **universal multi-account and persona management CLI tool** f
 - Identity generation (ChittyID)
 - Token provisioning (ChittyAuth)
 - Service registration (ChittyRegister)
-- Credential storage (delegates to 1Password)
+- Credential storage (delegates to chittysecrets)
 - Account creation (manages existing accounts)
 
 ## Configuration
@@ -78,7 +78,7 @@ ChittyContext is a **universal multi-account and persona management CLI tool** f
 | Type | Service | Purpose |
 |------|---------|---------|
 | Upstream | ChittyRegistry | Service discovery |
-| External | 1Password CLI | Secure secret fetching |
+| External | chittysecrets CLI | Secure secret fetching |
 | External | Cloudflare API | Account management |
 | External | GitHub API | Token management |
 | External | Google OAuth | Credential paths |
@@ -96,7 +96,7 @@ ChittyContext is a **universal multi-account and persona management CLI tool** f
 
 - [ ] CLAUDE.md development guide present
 - [ ] ChittyRegistry integration active
-- [ ] 1Password CLI integration tested
+- [ ] chittysecrets CLI integration tested
 - [ ] Shell integration documented
 - [ ] Config file permissions enforced (mode 600)
 
